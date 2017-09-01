@@ -1,4 +1,4 @@
-namespace JsonLocalization
+namespace LocalizationCultureCore
 {
     public class JsonLocalizationOptions
     {

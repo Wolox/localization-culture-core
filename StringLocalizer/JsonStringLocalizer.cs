@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace JsonLocalization.StringLocalizer
+namespace LocalizationCultureCore.StringLocalizer
 {
     public class JsonStringLocalizer : IStringLocalizer
     {

@@ -4,8 +4,8 @@ using Microsoft.Extensions.Localization;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    using global::JsonLocalization;
-    using global::JsonLocalization.StringLocalizer;
+    using global::LocalizationCultureCore;
+    using global::LocalizationCultureCore.StringLocalizer;
 
     public static class JsonLocalizationServiceCollectionExtensions
     {

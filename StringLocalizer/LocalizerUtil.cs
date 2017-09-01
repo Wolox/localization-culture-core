@@ -1,6 +1,6 @@
 using System;
 
-namespace JsonLocalization.StringLocalizer
+namespace LocalizationCultureCore.StringLocalizer
 {
     public static class LocalizerUtil
     {

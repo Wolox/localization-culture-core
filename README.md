@@ -6,7 +6,7 @@ Localization Culture NetCore
 1. Build the application on release mode.
 
 ```bash
-    dotnet build - c release
+    dotnet build -c release
 ```
 
 2. Pack the application.
@@ -14,7 +14,7 @@ Localization Culture NetCore
     dotnet pack /p:PackageVersion=x.x.x -c release.
 ```
 
-3. The NuGet Package is now in /bin/release/JsonLocalization.x.x.x.nupkg.
+3. The NuGet Package is now in /bin/release/LocalizationCultureCore.x.x.x.nupkg.
 
 4. Login at [NuGet](http://www.nuget.org) and upload the .nupkg file in [Upload](https://www.nuget.org/packages/manage/upload) section.
 
@@ -22,7 +22,7 @@ Localization Culture NetCore
 
 1. Add the package reference
 ```bash
-    dotnet add package JsonLocalization --version x.x.x
+    dotnet add package LocalizationCultureCore --version x.x.x
 ```
 
 2. On Startup.cs

@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace JsonLocalization
+namespace LocalizationCultureCore
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Localizaction v2.");
+            Console.WriteLine("Localizaction Culture Core.");
         }
     }
 }
