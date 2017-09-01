@@ -12,37 +12,37 @@ namespace LocalizationCultureCore.StringLocalizer
 {
     public class JsonStringLocalizerFactory : IStringLocalizerFactory
     {
-        private static readonly string[] KnownViewExtensions = new[] { ".cshtml" };
-        private readonly ConcurrentDictionary<string, JsonStringLocalizer> _LocalizerCache;        
-        private readonly IHostingEnvironment _ApplicationEnvironment;
-        private readonly ILogger<JsonStringLocalizerFactory> _Logger;
-        private string _ResourcesRelativePath;
+        private static readonly string[] _knownViewExtensions = new[] { ".cshtml" };
+        private readonly ConcurrentDictionary<string, JsonStringLocalizer> _localizerCache;        
+        private readonly IHostingEnvironment _applicationEnvironment;
+        private readonly ILogger<JsonStringLocalizerFactory> _logger;
+        private string _resourcesRelativePath;
 
-        public JsonStringLocalizerFactory(IHostingEnvironment ApplicationEnvironment, IOptions<JsonLocalizationOptions> LocalizationOptions,
-                                          ILogger<JsonStringLocalizerFactory> Logger)
+        public JsonStringLocalizerFactory(IHostingEnvironment applicationEnvironment, IOptions<JsonLocalizationOptions> localizationOptions,
+                                          ILogger<JsonStringLocalizerFactory> logger)
         {
-            if (ApplicationEnvironment == null) throw new ArgumentNullException(nameof(ApplicationEnvironment));
-            if (LocalizationOptions == null) throw new ArgumentNullException(nameof(LocalizationOptions));
-            if (Logger == null) throw new ArgumentNullException(nameof(Logger));
-            this._ApplicationEnvironment = ApplicationEnvironment;
-            this._Logger = Logger;
-            this._LocalizerCache = new ConcurrentDictionary<string, JsonStringLocalizer>();            
-            this._ResourcesRelativePath = LocalizationOptions.Value.ResourcesPath ?? String.Empty;
-            if (!String.IsNullOrEmpty(_ResourcesRelativePath))
+            if (applicationEnvironment == null) throw new ArgumentNullException(nameof(applicationEnvironment));
+            if (localizationOptions == null) throw new ArgumentNullException(nameof(localizationOptions));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            this._applicationEnvironment = applicationEnvironment;
+            this._logger = logger;
+            this._localizerCache = new ConcurrentDictionary<string, JsonStringLocalizer>();            
+            this._resourcesRelativePath = localizationOptions.Value.ResourcesPath ?? String.Empty;
+            if (!String.IsNullOrEmpty(_resourcesRelativePath))
             {
-                _ResourcesRelativePath = _ResourcesRelativePath
+                _resourcesRelativePath = _resourcesRelativePath
                     .Replace(Path.AltDirectorySeparatorChar, '.')
                     .Replace(Path.DirectorySeparatorChar, '.') + ".";
             }
-            Logger.LogTrace($"Created {nameof(JsonStringLocalizerFactory)} with:{Environment.NewLine}" +
-                $"    (application name: {_ApplicationEnvironment.ApplicationName}{Environment.NewLine}" +
-                $"    (resources relative path: {_ResourcesRelativePath})");
+            _logger.LogTrace($"Created {nameof(JsonStringLocalizerFactory)} with:{Environment.NewLine}" +
+                $"    (application name: {_applicationEnvironment.ApplicationName}{Environment.NewLine}" +
+                $"    (resources relative path: {_resourcesRelativePath})");
         }
 
-        public IStringLocalizer Create(Type ResourceSource)
+        public IStringLocalizer Create(Type resourceSource)
         {
-            if (ResourceSource == null) throw new ArgumentNullException(nameof(ResourceSource));          
-            Logger.LogTrace($"Getting localizer for type {ResourceSource}");
+            if (resourceSource == null) throw new ArgumentNullException(nameof(resourceSource));
+            Logger.LogTrace($"Getting localizer for type {resourceSource}");
             if(String.IsNullOrEmpty(ResourcesRelativePath)) throw new ArgumentNullException(nameof(ResourcesRelativePath));
             var ResourceBaseName = ApplicationEnvironment.ApplicationName + "." + ResourcesRelativePath;
             return LocalizerCache.GetOrAdd(ResourceBaseName, new JsonStringLocalizer(ResourceBaseName, ApplicationEnvironment.ApplicationName, Logger));
@@ -53,31 +53,36 @@ namespace LocalizationCultureCore.StringLocalizer
             if(String.IsNullOrEmpty(BaseName)) throw new ArgumentNullException(nameof(BaseName));            
             Logger.LogTrace($"Getting localizer for baseName {BaseName} and location {Location}");
             Location = Location ?? ApplicationEnvironment.ApplicationName;
-            var ResourceBaseName = Location + "." + ResourcesRelativePath;
-            var viewExtension = KnownViewExtensions.FirstOrDefault(extension => ResourceBaseName.EndsWith(extension));
-            if (viewExtension != null) ResourceBaseName = ResourceBaseName.Substring(0, ResourceBaseName.Length - viewExtension.Length);
-            Logger.LogTrace($"Localizer basename: {ResourceBaseName}");
-            return LocalizerCache.GetOrAdd(ResourceBaseName, new JsonStringLocalizer(ResourceBaseName, ApplicationEnvironment.ApplicationName, Logger));
+            var resourceBaseName = Location + "." + ResourcesRelativePath;
+            var viewExtension = KnownViewExtensions.FirstOrDefault(extension => resourceBaseName.EndsWith(extension));
+            if (viewExtension != null) resourceBaseName = resourceBaseName.Substring(0, resourceBaseName.Length - viewExtension.Length);
+            Logger.LogTrace($"Localizer basename: {resourceBaseName}");
+            return LocalizerCache.GetOrAdd(resourceBaseName, new JsonStringLocalizer(resourceBaseName, ApplicationEnvironment.ApplicationName, Logger));
         }
 
         public ILogger Logger
         {
-            get { return _Logger; }
+            get { return _logger; }
         }
 
         public string ResourcesRelativePath
         {
-            get { return _ResourcesRelativePath; }
+            get { return _resourcesRelativePath; }
         }
 
         public ConcurrentDictionary<string, JsonStringLocalizer> LocalizerCache
         {
-            get { return _LocalizerCache; }
+            get { return _localizerCache; }
         }
 
         public IHostingEnvironment ApplicationEnvironment
         {
-            get { return _ApplicationEnvironment; }
+            get { return _applicationEnvironment; }
+        }
+
+        public string[] KnownViewExtensions
+        {
+            get { return _knownViewExtensions; }
         }
     }
 }

@@ -9,23 +9,23 @@ namespace Microsoft.Extensions.DependencyInjection
 
     public static class JsonLocalizationServiceCollectionExtensions
     {
-        public static IServiceCollection AddJsonLocalization(this IServiceCollection Services)
+        public static IServiceCollection AddJsonLocalization(this IServiceCollection services)
         {
-            if(Services == null) throw new ArgumentNullException(nameof(Services));
-            return AddJsonLocalization(Services, SetupAction: null);
+            if(services == null) throw new ArgumentNullException(nameof(services));
+            return AddJsonLocalization(services, setupAction: null);
         }
 
-        public static IServiceCollection AddJsonLocalization(this IServiceCollection Services, Action<JsonLocalizationOptions> SetupAction)
+        public static IServiceCollection AddJsonLocalization(this IServiceCollection services, Action<JsonLocalizationOptions> setupAction)
         {
-            if (Services == null) throw new ArgumentNullException(nameof(Services));
-            Services.TryAdd(new ServiceDescriptor(typeof(IStringLocalizerFactory), 
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            services.TryAdd(new ServiceDescriptor(typeof(IStringLocalizerFactory), 
                                                   typeof(JsonStringLocalizerFactory), 
                                                   ServiceLifetime.Singleton));
-            Services.TryAdd(new ServiceDescriptor(typeof(IStringLocalizer), 
+            services.TryAdd(new ServiceDescriptor(typeof(IStringLocalizer), 
                                                   typeof(JsonStringLocalizer), 
                                                   ServiceLifetime.Singleton));
-            if (SetupAction != null) Services.Configure(SetupAction);
-            return Services;
+            if (setupAction != null) services.Configure(setupAction);
+            return services;
         }
     }
 }
