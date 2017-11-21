@@ -9,6 +9,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace LocalizationCultureCore.StringLocalizer
 {
@@ -20,8 +21,12 @@ namespace LocalizationCultureCore.StringLocalizer
         private readonly ILogger _logger;
         private readonly string _resourceFileLocation;
         private readonly char _jsonSplitter;
+        private readonly CultureInfo _currentCulture;
 
-        public JsonStringLocalizer(string baseName, string applicationName, ILogger logger)
+        public JsonStringLocalizer(string baseName, string applicationName, ILogger logger) 
+                :this(baseName, applicationName, logger, CultureInfo.CurrentUICulture){}
+        
+        public JsonStringLocalizer(string baseName, string applicationName, ILogger logger, CultureInfo currentCulture)
         {
             if (String.IsNullOrEmpty(baseName)) throw new ArgumentNullException(nameof(baseName));
             if (String.IsNullOrEmpty(applicationName)) throw new ArgumentNullException(nameof(applicationName));
@@ -31,6 +36,7 @@ namespace LocalizationCultureCore.StringLocalizer
             this._applicationName = applicationName;
             this._logger = logger;
             this._jsonSplitter = ':';
+            this._currentCulture = currentCulture;
             _resourceFileLocation = LocalizerUtil.TrimPrefix(_baseName, _applicationName).Trim('.');
             _logger.LogTrace($"Resource file location base path: {_resourceFileLocation}");
         }
@@ -56,6 +62,37 @@ namespace LocalizationCultureCore.StringLocalizer
             }
         }
 
+        public IStringLocalizer WithCulture(CultureInfo culture) => new JsonStringLocalizer(BaseName, _applicationName, Logger, culture);
+
+        public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
+        {
+            var cultures = new List<CultureInfo> { CurrentCulture };
+            var currentCulture = CurrentCulture;
+            CultureInfo previousCulture = null;
+            var strings = new List<LocalizedString>();
+            if(includeParentCultures)
+            {
+                do
+                {
+                    previousCulture = currentCulture;
+                    currentCulture = currentCulture.Parent;
+                    if(!String.IsNullOrEmpty(currentCulture.Name))
+                        cultures.Add(currentCulture);
+                } while(previousCulture != currentCulture);
+            }
+            foreach(var culture in cultures)
+            {
+                var resourceObject = GetResourceObject(culture);
+                if(resourceObject != null)
+                {
+                    var values = resourceObject.Values();
+                    strings.AddRange(from value in values select new LocalizedString(value.Path, value.Value<string>()));
+                }
+                else Logger.LogInformation($"No resource file found or error occurred for base name {BaseName} and culture {culture}.");
+            }
+            return strings;
+        }
+
         protected string GetLocalizedString(string name, CultureInfo culture)
         {
             if (String.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
@@ -67,8 +104,8 @@ namespace LocalizationCultureCore.StringLocalizer
                 if (resourceObject == null) Logger.LogInformation($"No resource file found or error occurred for base name {BaseName}, culture {currentCulture} and key '{name}'");
                 else
                 {
-                    JToken Value = TryGetValue(resourceObject, name);
-                    if(Value != null) return Value.ToString();
+                    JToken value = TryGetValue(resourceObject, name);
+                    if(value != null) return value.ToString();
                 }
                 previousCulture = currentCulture;
                 currentCulture = currentCulture.Parent;
@@ -162,9 +199,9 @@ namespace LocalizationCultureCore.StringLocalizer
             get { return _resourceObjectCache; }
         }
 
-        #region InterfaceNotImplementedMethods
-        public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => throw new NotImplementedException();
-        public IStringLocalizer WithCulture(CultureInfo culture) => throw new NotImplementedException();
-        #endregion
+        public CultureInfo CurrentCulture
+        {
+            get { return _currentCulture; }
+        }
     }
 }
