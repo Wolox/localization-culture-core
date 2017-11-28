@@ -46,7 +46,7 @@ namespace LocalizationCultureCore.StringLocalizer
             get
             {
                 if (String.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-                var value = GetLocalizedString(name, CultureInfo.CurrentUICulture);
+                var value = GetLocalizedString(name, CurrentCulture);
                 return new LocalizedString(name, value ?? name, resourceNotFound: value == null);
             }
         }
@@ -56,7 +56,7 @@ namespace LocalizationCultureCore.StringLocalizer
             get
             {
                 if (String.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-                var format = GetLocalizedString(name, CultureInfo.CurrentUICulture);
+                var format = GetLocalizedString(name, CurrentCulture);
                 var value = string.Format(format ?? name, arguments);
                 return new LocalizedString(name, value, resourceNotFound: format == null);
             }
