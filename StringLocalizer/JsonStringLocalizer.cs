@@ -96,7 +96,7 @@ namespace LocalizationCultureCore.StringLocalizer
         protected string GetLocalizedString(string name, CultureInfo culture)
         {
             if (String.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-            var currentCulture = CultureInfo.CurrentCulture;
+            var currentCulture = culture;
             CultureInfo previousCulture = null;
             do
             {
