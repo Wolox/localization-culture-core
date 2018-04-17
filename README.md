@@ -34,7 +34,7 @@ The last line allows to use the localizer in the views.
 To configure a default culture, you can do the following:
 
 ```bash
-    CultureInfo.CurrentCulture = new CultureInfo("en-US");
+    CultureInfo.CurrentUICulture = new CultureInfo("en-US");
 ```
 
 You can see a full example [here](https://gist.github.com/gzamudio/4db43b93ea73d49e062654fd124dab26)
